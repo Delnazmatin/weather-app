@@ -1,4 +1,8 @@
-import { useCallback, useEffect, useState, type JSX } from "react";
+import { useEffect, useState, type JSX } from "react";
+import { fetchWeather } from "../api/weatherApi";
+import { WeatherReportButton } from "../components/WeatherReportButton/WeatherReportButton";
+import { WeatherInfo } from "../components/WeatherInfo/WeatherInfo";
+import type { WeatherData } from "../api/weatherApi";
 import { FaCloudSun } from "react-icons/fa";
 import { FaCloud } from "react-icons/fa6";
 import { FaSun } from "react-icons/fa6";
@@ -10,17 +14,7 @@ import { BsFillCloudLightningRainFill } from "react-icons/bs";
 import { BsFillCloudSnowFill } from "react-icons/bs";
 import { BsFillCloudRainHeavyFill } from "react-icons/bs";
 import { LocationInput } from "../components/LocationInput/LocationInput";
-import { WeatherReportButton } from "../components/WeatherReportButton/WeatherReportButton";
-import { WeatherInfo } from "../components/WeatherInfo/WeatherInfo";
 
-type WeatherData = {
-  current: {
-    temperature_2m: number;
-    weather_code: number;
-    wind_speed_10m: number;
-    relative_humidity_2m: number;
-  };
-};
 export type WeatherInfoProps = {
   error: string | null;
   date: string;
@@ -103,46 +97,26 @@ export const MainPage = () => {
     99: <BsFillCloudLightningRainFill />,
   };
 
-  const fetchWeather = useCallback(async () => {
+  useEffect(() => {
     if (!city) return;
-    try {
-      //part 1
-      const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`;
-      const response = await fetch(geoUrl);
-      if (!response.ok) {
-        throw new Error("geocoding failed");
+    const loadWeather = async () => {
+      if (!city) return;
+      try {
+        const data = await fetchWeather(city);
+        setWeatherData(data);
+        setError(null);
+      } catch (err) {
+        setWeatherData(null);
+        setError((err as Error).message);
       }
-      const geoData = await response.json();
-      if (!geoData.results || geoData.results.length === 0) {
-        throw new Error("city not found");
-      }
-      const { latitude, longitude } = geoData.results[0];
-
-      //part 2
-      const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m&timezone=auto`;
-      const forecastResponse = await fetch(forecastUrl);
-      if (!forecastResponse.ok) {
-        throw new Error("Forecast failed");
-      }
-      const data = await forecastResponse.json();
-      setWeatherData(data);
-      setError(null);
-    } catch (err) {
-      setError((err as Error).message);
-      console.log(err);
-    }
+    };
+    loadWeather();
   }, [city]);
 
-  useEffect(() => {
-    fetchWeather();
-  }, [fetchWeather]);
-
   const current = weatherData?.current;
-
   const temperature = current
     ? `${Math.round(current.temperature_2m)}°C`
     : "N/A";
-
   const weatherDesc =
     current !== undefined
       ? weatherCodeMap[current.weather_code] || "Unknown"
@@ -172,7 +146,6 @@ export const MainPage = () => {
             humidity={humidity}
           />
         </div>
-
         <div className="report">
           <WeatherReportButton />
         </div>

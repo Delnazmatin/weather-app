@@ -11,12 +11,16 @@ export const WeatherInfo = ({
   return (
     <>
       <div className="informationContent">
-        {error ? <p>Error: {error}</p> : null}
+        {error ? <p className="errorCity">Error: {error}</p> : null}
         <p>{date}</p>
         <h1>{temperature}</h1>
         <h3>{weatherDesc}</h3>
-        <h6>Wind:{wind}</h6>
-        <h6>Hum: {humidity}</h6>
+        <h6>
+          Wind: <i>{wind}</i>
+        </h6>
+        <h6>
+          Hum: <i>{humidity}</i>
+        </h6>
       </div>
     </>
   );

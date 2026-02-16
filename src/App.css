@@ -80,14 +80,15 @@ h6 {
   width: 80%;
   height: 100%;
   background-color: #b6ddffc8;
-  border: 1px solid rgb(242, 242, 242);
+  border: 1px solid gray;
   border-radius: 10px;
-  line-height: 1px;
   box-shadow: 1px 1px 12px gray;
+  padding: 10px;
 }
 .informationContent h1,
-h3 {
-  padding: 20px;
+h3,
+h6 {
+  margin: 5px 0px;
 }
 .report {
   grid-area: bottom;
@@ -99,7 +100,11 @@ h3 {
   background-color: white;
   padding: 12px 20px;
   color: black;
-  border: none;
+  border: 0.5px solid gray;
   border-radius: 12px;
   box-shadow: 3px 3px 4px lightgray inset;
+}
+.errorCity {
+  color: black;
+  padding: 10px;
 }
